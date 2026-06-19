@@ -66,4 +66,28 @@ class TeacherMapperTest {
         assertThat(teachers).hasSize(2);
         assertThat(teachers.get(0).getFirstName()).isEqualTo("Alice");
     }
+
+    @Test
+    void toDto_shouldReturnNull_whenTeacherIsNull() {
+        TeacherDto dto = teacherMapper.toDto((Teacher) null);
+        assertThat(dto).isNull();
+    }
+
+    @Test
+    void toEntity_shouldReturnNull_whenTeacherDtoIsNull() {
+        Teacher teacher = teacherMapper.toEntity((TeacherDto) null);
+        assertThat(teacher).isNull();
+    }
+
+    @Test
+    void toDto_shouldReturnNull_whenListIsNull() {
+        List<TeacherDto> dtos = teacherMapper.toDto((List<Teacher>) null);
+        assertThat(dtos).isNull();
+    }
+
+    @Test
+    void toEntity_shouldReturnNull_whenListIsNull() {
+        List<Teacher> teachers = teacherMapper.toEntity((List<TeacherDto>) null);
+        assertThat(teachers).isNull();
+    }
 }

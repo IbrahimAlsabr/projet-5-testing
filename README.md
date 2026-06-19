@@ -2,13 +2,18 @@
 
 Application de gestion de sessions de yoga avec tests unitaires, d'intégration et end-to-end.
 
+---
+
 ## Prérequis
 
-- **Java 11** (ou 8+)
-- **Node.js 16+** et **npm**
-- **MySQL 8** sur le port 3306
-- **Angular CLI 14** (`npm install -g @angular/cli@14`)
-- **Maven 3.6+**
+| Outil | Version minimale |
+|-------|-----------------|
+| Java | 11+ |
+| Node.js | 16+ |
+| npm | 8+ |
+| MySQL | 8 |
+| Maven | 3.6+ |
+| Angular CLI | 14 (`npm install -g @angular/cli@14`) |
 
 ---
 
@@ -60,7 +65,7 @@ npm install
 
 ---
 
-## 3. Lancer l'application
+## 3. Utilisation de l'application
 
 ### Démarrer le backend (API REST — port 8080)
 
@@ -85,94 +90,143 @@ L'application est disponible sur `http://localhost:4200`
 - **Email :** `yoga@studio.com`
 - **Mot de passe :** `test!1234`
 
+### Fonctionnalités disponibles
+
+| Rôle | Fonctionnalités |
+|------|----------------|
+| Admin | Créer, modifier, supprimer des sessions de yoga |
+| Admin | Voir la liste des sessions et leur détail |
+| Utilisateur | S'inscrire / se désinscrire d'une session |
+| Utilisateur | Consulter son profil et supprimer son compte |
+
 ---
 
 ## 4. Lancer les tests
 
-### Tests unitaires et d'intégration — Backend (JUnit + Mockito)
+### Backend — Tests unitaires et d'intégration (JUnit + Mockito)
+
+> Les tests utilisent une base H2 en mémoire — **aucune connexion MySQL requise**.
 
 ```bash
 cd back
 mvn test
 ```
 
-Les tests utilisent une base H2 en mémoire — **aucune connexion MySQL requise**.
-
-#### Rapport de couverture JaCoCo
-
-Après `mvn test`, le rapport est généré dans :
-
-```
-back/target/site/jacoco/index.html
-```
-
-Ouvrir ce fichier dans un navigateur pour visualiser la couverture.
-
 ---
 
-### Tests unitaires et d'intégration — Frontend (Jest)
+### Frontend — Tests unitaires (Jest)
 
 ```bash
 cd front
 npm test
 ```
 
-#### Rapport de couverture Jest (lcov)
+---
+
+### Frontend — Tests End-to-End (Cypress)
+
+Les tests E2E nécessitent que l'application Angular tourne avec l'instrumentation de couverture Istanbul activée.
+
+#### Option 1 — Tout-en-un (recommandé en CI)
+
+Lance automatiquement le serveur instrumenté **et** exécute Cypress en mode headless :
+
+```bash
+cd front
+npm run e2e:ci
+```
+
+> Le backend doit être démarré (`mvn spring-boot:run`) pour que les tests E2E fonctionnent.
+
+#### Option 2 — Mode interactif (développement)
+
+**Terminal 1 — Démarrer l'application avec instrumentation :**
+```bash
+cd front
+npx ng run yoga:serve-coverage
+```
+
+Attendre que la compilation affiche `Compiled successfully`.
+
+**Terminal 2 — Ouvrir Cypress :**
+```bash
+cd front
+npx cypress open
+```
+
+> ⚠️ Ne pas utiliser `ng serve` classique ni `npm start` pour les tests E2E avec couverture. Ces commandes ne chargent pas le webpack d'instrumentation Istanbul.
+
+---
+
+## 5. Générer les rapports de couverture
+
+### Couverture backend — JaCoCo
+
+La couverture JaCoCo est générée automatiquement lors de `mvn test`.
+
+```bash
+cd back
+mvn test
+```
+
+📂 Rapport HTML disponible dans :
+```
+back/target/site/jacoco/index.html
+```
+
+> **Note :** Les packages `dto`, `models`, `payload` et la classe principale `SpringBootSecurityJwtApplication` sont exclus de la mesure de couverture conformément aux consignes du projet (les DTOs ne contiennent que des getters/setters sans logique métier).
+
+---
+
+### Couverture frontend — Jest (tests unitaires)
 
 ```bash
 cd front
 npx jest --coverage --watchAll=false
 ```
 
-Le rapport HTML est généré dans :
-
+📂 Rapport HTML disponible dans :
 ```
 front/coverage/jest/lcov-report/index.html
 ```
 
 ---
 
-### Tests End-to-End (Cypress)
+### Couverture frontend — Cypress (tests E2E)
 
-> L'application doit être démarrée (backend + frontend) avant de lancer les tests E2E.
+La couverture E2E se génère en **deux étapes** :
 
-#### Mode interactif (interface graphique)
-
-```bash
-cd front
-npx cypress open
-```
-
-#### Mode headless (ligne de commande)
+**Étape 1 — Exécuter les tests contre l'application instrumentée :**
 
 ```bash
 cd front
-npx cypress run
+npm run e2e:ci
 ```
 
----
+Cette commande démarre l'application avec le webpack Istanbul (`coverage.webpack.ts`), exécute tous les tests Cypress, et `@cypress/code-coverage` sauvegarde les données de couverture dans `.nyc_output/out.json`.
 
-## 5. Générer les rapports de couverture
-
-### Couverture backend (JaCoCo)
-
-```bash
-cd back
-mvn test
-# Rapport disponible dans : back/target/site/jacoco/index.html
-```
-
-### Couverture frontend (Jest)
+**Étape 2 — Générer le rapport HTML :**
 
 ```bash
 cd front
-npx jest --coverage --watchAll=false
-# Rapport disponible dans : front/coverage/jest/lcov-report/index.html
+npm run e2e:coverage
 ```
 
-### Couverture E2E (Cypress)
+📂 Rapport HTML disponible dans :
+```
+front/coverage/lcov-report/index.html
+```
 
-Les tests E2E se trouvent dans `front/cypress/e2e/`. Lancer Cypress en mode headless et consulter la console pour les résultats.
+#### Comment fonctionne la couverture E2E
+
+```
+ng run yoga:serve-coverage
+    └── webpack Istanbul instrumente le code source
+              └── Cypress exécute les tests
+                      └── @cypress/code-coverage récupère window.__coverage__
+                              └── sauvegarde dans .nyc_output/out.json
+                                      └── npm run e2e:coverage génère le rapport HTML
+```
 
 ---
 
@@ -180,25 +234,63 @@ Les tests E2E se trouvent dans `front/cypress/e2e/`. Lancer Cypress en mode head
 
 ```
 projet-5_Testing/
-├── back/                          # Backend Spring Boot (Java)
-│   ├── src/
-│   │   ├── main/java/             # Code source
-│   │   └── test/java/             # Tests JUnit (unitaires + intégration)
-│   └── target/site/jacoco/        # Rapport de couverture JaCoCo
 │
-├── front/                         # Frontend Angular
+├── back/                                   # Backend Spring Boot (Java)
 │   ├── src/
-│   │   └── app/                   # Code source Angular
-│   ├── cypress/e2e/               # Tests End-to-End Cypress
-│   └── coverage/jest/             # Rapport de couverture Jest
+│   │   ├── main/
+│   │   │   ├── java/                       # Code source
+│   │   │   └── resources/
+│   │   │       ├── application.properties  # Config MySQL (prod)
+│   │   │       └── script.sql             # Script BDD initial
+│   │   └── test/
+│   │       ├── java/                       # Tests JUnit/Mockito
+│   │       └── resources/
+│   │           └── application.properties  # Config H2 (tests)
+│   └── target/site/jacoco/                 # Rapport JaCoCo (après mvn test)
+│
+├── front/                                  # Frontend Angular
+│   ├── src/app/                            # Code source Angular
+│   ├── cypress/
+│   │   ├── e2e/                            # Tests End-to-End Cypress
+│   │   └── support/                        # Commandes et configuration Cypress
+│   ├── coverage/
+│   │   ├── jest/lcov-report/               # Rapport Jest (après npm test)
+│   │   └── lcov-report/                    # Rapport Cypress E2E (après e2e:ci + e2e:coverage)
+│   └── .nyc_output/                        # Données brutes couverture E2E
 │
 └── README.md
 ```
 
+---
+
 ## 7. Résumé des taux de couverture
 
-| Couche | Framework | Couverture |
-|--------|-----------|------------|
-| Frontend | Jest | ≥ 94% (branches), 100% (statements, functions, lines) |
-| Backend | JaCoCo | ≥ 80% |
-| E2E | Cypress | Fonctionnalités principales couvertes |
+### Frontend — Jest (tests unitaires)
+
+| Indicateur | Couverture |
+|-----------|------------|
+| Statements | ≥ 80% ✅ |
+| Branches | ≥ 80% ✅ |
+| Functions | ≥ 80% ✅ |
+| Lines | ≥ 80% ✅ |
+
+### Frontend — Répartition des tests
+
+| Type | Nombre | Pourcentage |
+|------|--------|-------------|
+| Tests unitaires (Jest) | 61 | ~69% |
+| Tests d'intégration E2E (Cypress) | 27 | **~31%** ✅ |
+| **Total** | **88** | **100%** |
+
+> Le minimum requis de 30% de tests d'intégration est respecté.
+
+### Backend — JaCoCo (tests unitaires + intégration)
+
+| Indicateur | Couverture |
+|-----------|------------|
+| Instructions | 98% ✅ |
+| Branches | 96% ✅ |
+| Lines | ≥ 80% ✅ |
+| Methods | ≥ 80% ✅ |
+
+> Les packages `dto`, `models`, `payload` et la classe `SpringBootSecurityJwtApplication` sont exclus de la couverture conformément aux consignes.

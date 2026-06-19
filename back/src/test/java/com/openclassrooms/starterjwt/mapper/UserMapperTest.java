@@ -72,4 +72,28 @@ class UserMapperTest {
         assertThat(users).hasSize(2);
         assertThat(users.get(0).getEmail()).isEqualTo("a@test.com");
     }
+
+    @Test
+    void toDto_shouldReturnNull_whenUserIsNull() {
+        UserDto dto = userMapper.toDto((User) null);
+        assertThat(dto).isNull();
+    }
+
+    @Test
+    void toEntity_shouldReturnNull_whenUserDtoIsNull() {
+        User user = userMapper.toEntity((UserDto) null);
+        assertThat(user).isNull();
+    }
+
+    @Test
+    void toDto_shouldReturnNull_whenListIsNull() {
+        List<UserDto> dtos = userMapper.toDto((List<User>) null);
+        assertThat(dtos).isNull();
+    }
+
+    @Test
+    void toEntity_shouldReturnNull_whenListIsNull() {
+        List<User> users = userMapper.toEntity((List<UserDto>) null);
+        assertThat(users).isNull();
+    }
 }
