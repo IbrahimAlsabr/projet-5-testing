@@ -265,32 +265,40 @@ projet-5_Testing/
 
 ## 7. Résumé des taux de couverture
 
-### Frontend — Jest (tests unitaires)
+### Frontend — Tests unitaires (Jest)
 
-| Indicateur | Couverture |
-|-----------|------------|
-| Statements | ≥ 80% ✅ |
-| Branches | ≥ 80% ✅ |
-| Functions | ≥ 80% ✅ |
-| Lines | ≥ 80% ✅ |
+| Indicateur | Résultat | Seuil requis |
+|-----------|----------|-------------|
+| Statements | **100%** | 80% min |
+| Branches | **94.11%** | 80% min |
+| Functions | **100%** | 80% min |
+| Lines | **100%** | 80% min |
 
-### Frontend — Répartition des tests
+Rapport : `front/coverage/jest/lcov-report/index.html`
 
-| Type | Nombre | Pourcentage |
-|------|--------|-------------|
-| Tests unitaires (Jest) | 61 | ~69% |
-| Tests d'intégration E2E (Cypress) | 27 | **~31%** ✅ |
-| **Total** | **88** | **100%** |
+### Frontend — Tests E2E (Cypress)
 
-> Le minimum requis de 30% de tests d'intégration est respecté.
+| Indicateur | Résultat | Seuil requis |
+|-----------|----------|-------------|
+| Statements | **84.08%** | 80% min |
+| Branches | **83.83%** | 80% min |
+| Functions | **83.68%** | 80% min |
+| Lines | **83.78%** | 80% min |
+
+Rapport : `front/coverage/lcov-report/index.html`
+
+
+Le minimum requis de 30% de tests d'intégration est respecté.
 
 ### Backend — JaCoCo (tests unitaires + intégration)
 
-| Indicateur | Couverture |
-|-----------|------------|
-| Instructions | 98% ✅ |
-| Branches | 96% ✅ |
-| Lines | ≥ 80% ✅ |
-| Methods | ≥ 80% ✅ |
+| Indicateur | Résultat | Seuil requis |
+|-----------|----------|-------------|
+| Instructions | **98%** | 80% min |
+| Branches | **96%** | 80% min |
+| Lines | **≥ 80%** | 80% min |
+| Methods | **≥ 80%** | 80% min |
 
-> Les packages `dto`, `models`, `payload` et la classe `SpringBootSecurityJwtApplication` sont exclus de la couverture conformément aux consignes.
+Rapport : `back/target/site/jacoco/index.html`
+
+> Les packages `dto`, `models`, `payload` et la classe `SpringBootSecurityJwtApplication` sont exclus de la mesure de couverture conformément aux consignes du projet.
